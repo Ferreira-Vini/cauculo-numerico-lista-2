@@ -1,0 +1,106 @@
+
+import numpy as np
+
+# Sistema linear:
+# 5x1 + 2x2 + x3 = 7
+# -x1 + 4x2 + 2x3 = 3
+# 2x1 - 3x2 + 10x3 = -1
+
+A = np.array([
+    [5, 2, 1],
+    [-1, 4, 2],
+    [2, -3, 10]
+], dtype=float)
+
+b = np.array([7, 3, -1], dtype=float)
+
+# Estimativa inicial e tolerancia
+x0 = np.array([0, 0, 0], dtype=float)
+tol = 0.01
+max_iter = 1000
+
+
+# METODO DE JACOBI
+def jacobi(A, b, x0, tol, max_iter):
+    n = len(b)
+    x = x0.copy()
+
+    print("\n===== METODO DE JACOBI =====")
+    print("Iteracao 0:", x)
+
+    for k in range(1, max_iter + 1):
+        x_novo = np.zeros(n)
+
+        for i in range(n):
+            soma = 0
+
+            for j in range(n):
+                if i != j:
+                    soma += A[i, j] * x[j]
+
+            x_novo[i] = (b[i] - soma) / A[i, i]
+
+        erro = np.max(np.abs(x_novo - x))
+
+        print(f"Iteracao {k}: {x_novo}, erro = {erro:.6f}")
+
+        x = x_novo.copy()
+
+        if erro < tol:
+            break
+
+    return x, k
+
+
+# METODO DE GAUSS-SEIDEL
+def gauss_seidel(A, b, x0, tol, max_iter):
+    n = len(b)
+    x = x0.copy()
+
+    print("\n===== METODO DE GAUSS-SEIDEL =====")
+    print("Iteracao 0:", x)
+
+    for k in range(1, max_iter + 1):
+        x_antigo = x.copy()
+
+        for i in range(n):
+            soma = 0
+
+            for j in range(n):
+                if i != j:
+                    soma += A[i, j] * x[j]
+
+            x[i] = (b[i] - soma) / A[i, i]
+
+        erro = np.max(np.abs(x - x_antigo))
+
+        print(f"Iteracao {k}: {x}, erro = {erro:.6f}")
+
+        if erro < tol:
+            break
+
+    return x, k
+
+
+# Executar os metodos
+sol_jacobi, iter_jacobi = jacobi(
+    A, b, x0, tol, max_iter
+)
+
+sol_gauss, iter_gauss = gauss_seidel(
+    A, b, x0, tol, max_iter
+)
+
+
+# Comparacao dos resultados
+print("\n===== COMPARACAO FINAL =====")
+
+print("\nJacobi:")
+print("Solucao aproximada:", sol_jacobi)
+print("Numero de iteracoes:", iter_jacobi)
+
+print("\nGauss-Seidel:")
+print("Solucao aproximada:", sol_gauss)
+print("Numero de iteracoes:", iter_gauss)
+
+print("\nSolucao exata:", np.linalg.solve(A, b))
