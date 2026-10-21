@@ -1,1 +1,0 @@
-# cauculo-numerico-lista-2
