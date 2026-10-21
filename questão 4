@@ -1,0 +1,84 @@
+mport numpy as np
+
+A = np.array([
+    [5, 2, 1],
+    [-1, 4, 2],
+    [2, -3, 10]
+], dtype=float)
+
+b = np.array([7, 3, -1], dtype=float)
+x0 = np.array([-2.4, 5, 0.3], dtype=float)
+tol = 1e-2
+
+# Criterio das linhas
+print("Criterio das linhas:")
+
+for i in range(len(b)):
+    diagonal = abs(A[i][i])
+    soma = sum(abs(A[i][j])
+               for j in range(len(b)) if i != j)
+
+    print(f"Linha {i+1}: {diagonal} > {soma}")
+
+# Criterio de Sassenfeld
+print("\nCriterio de Sassenfeld:")
+
+beta = np.zeros(len(b))
+
+for i in range(len(b)):
+    soma = 0
+
+    for j in range(i):
+        soma += abs(A[i][j]) * beta[j]
+
+    for j in range(i + 1, len(b)):
+        soma += abs(A[i][j])
+
+    beta[i] = soma / abs(A[i][i])
+    print(f"Beta {i+1} = {beta[i]:.3f}")
+
+print("Maior beta:", max(beta))
+print("Converge:", max(beta) < 1)
+
+# Metodo de Jacobi
+x = x0.copy()
+
+for k in range(1000):
+    x_novo = np.zeros(len(b))
+
+    for i in range(len(b)):
+        soma = sum(A[i][j] * x[j]
+                   for j in range(len(b)) if i != j)
+
+        x_novo[i] = (b[i] - soma) / A[i][i]
+
+    erro = np.max(np.abs(x_novo - x))
+    x = x_novo
+
+    if erro < tol:
+        break
+
+print("\nJacobi:")
+print("Solucao:", x)
+print("Iteracoes:", k + 1)
+
+# Metodo de Gauss-Seidel
+x = x0.copy()
+
+for k in range(1000):
+    x_antigo = x.copy()
+
+    for i in range(len(b)):
+        soma = sum(A[i][j] * x[j]
+                   for j in range(len(b)) if i != j)
+
+        x[i] = (b[i] - soma) / A[i][i]
+
+    erro = np.max(np.abs(x - x_antigo))
+
+    if erro < tol:
+        break
+
+print("\nGauss-Seidel:")
+print("Solucao:", x)
+print("Iteracoes:", k + 1)
