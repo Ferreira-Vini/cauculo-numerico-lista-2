@@ -1,0 +1,81 @@
+import numpy as np
+
+# Dados da tabela da questao 8
+x_dados = np.array([0, 0.5, 1, 1.5, 2, 2.5, 3], dtype=float)
+y_dados = np.array([
+    1.8421, 2.4694, 2.4921, 1.9047,
+    0.8509, -0.4112, -1.5727
+], dtype=float)
+
+
+# Funcao para calcular o polinomio interpolador de Lagrange
+def lagrange(x, pontos_x, pontos_y):
+    resultado = 0.0
+    n = len(pontos_x)
+
+    for i in range(n):
+        termo = pontos_y[i]
+
+        for j in range(n):
+            if i != j:
+                termo *= (x - pontos_x[j]) / (
+                    pontos_x[i] - pontos_x[j]
+                )
+
+        resultado += termo
+
+    return resultado
+
+
+# Metodo da bisseccao para encontrar a raiz
+def bisseccao(pontos_x, pontos_y, a, b, tol=1e-10):
+    fa = lagrange(a, pontos_x, pontos_y)
+    fb = lagrange(b, pontos_x, pontos_y)
+
+    if fa * fb > 0:
+        raise ValueError("O intervalo nao apresenta troca de sinal.")
+
+    while (b - a) / 2 > tol:
+        meio = (a + b) / 2
+        fm = lagrange(meio, pontos_x, pontos_y)
+
+        if fm == 0:
+            return meio
+
+        if fa * fm < 0:
+            b = meio
+            fb = fm
+        else:
+            a = meio
+            fa = fm
+
+    return (a + b) / 2
+
+
+# A) Interpolacao com tres pontos consecutivos
+x3 = x_dados[3:6]  # 1.5, 2.0, 2.5
+y3 = y_dados[3:6]
+
+raiz3 = bisseccao(x3, y3, 2.0, 2.5)
+
+# B) Interpolacao com quatro pontos consecutivos
+x4 = x_dados[3:7]  # 1.5, 2.0, 2.5, 3.0
+y4 = y_dados[3:7]
+
+raiz4 = bisseccao(x4, y4, 2.0, 2.5)
+
+# Resultados
+print("\nA) Usando tres pontos:")
+print("Pontos x:", x3)
+print("Pontos y:", y3)
+print("Raiz aproximada:", raiz3)
+print("Valor do polinomio na raiz:", lagrange(raiz3, x3, y3))
+
+print("\nB) Usando quatro pontos:")
+print("Pontos x:", x4)
+print("Pontos y:", y4)
+print("Raiz aproximada:", raiz4)
+print("Valor do polinomio na raiz:", lagrange(raiz4, x4, y4))
+
+print("\nCOMPARACAO")
+print("Diferenca entre as raizes:", abs(raiz3 - raiz4))
